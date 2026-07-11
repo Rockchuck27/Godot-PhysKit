@@ -1,0 +1,76 @@
+[gd_scene format=3 uid="uid://ufj107qbr1n5"]
+
+[ext_resource type="Script" uid="uid://d1udf4t2eh5ob" path="res://PhysKit/PlayerController.cs" id="1_xhfnw"]
+[ext_resource type="Script" uid="uid://d0cr6nkehyxpl" path="res://PhysKit/PlayerInteraction.cs" id="2_kpjcp"]
+[ext_resource type="PackedScene" uid="uid://bsps4p0cvgkyk" path="res://PhysKit/Grab Pivot.tscn" id="3_kne1u"]
+[ext_resource type="PackedScene" uid="uid://bbmai8vp77er" path="res://PhysKit/fixed_joint.tscn" id="4_e80uo"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_c6gwx"]
+friction = 0.0
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_4gn1o"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_p21k6"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_js7pq"]
+
+[sub_resource type="Sky" id="Sky_bcbcq"]
+sky_material = SubResource("ProceduralSkyMaterial_js7pq")
+
+[sub_resource type="Environment" id="Environment_2dftf"]
+background_mode = 2
+sky = SubResource("Sky_bcbcq")
+
+[sub_resource type="BoxMesh" id="BoxMesh_4gn1o"]
+size = Vector3(0.7416992, 0.2932129, 0.30322266)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_p21k6"]
+albedo_color = Color(0, 0, 0, 1)
+
+[node name="Player" type="RigidBody3D" unique_id=138694681 node_paths=PackedStringArray("camera")]
+transform = Transform3D(0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0, 1, 0, 0, 0)
+axis_lock_angular_x = true
+axis_lock_angular_y = true
+axis_lock_angular_z = true
+physics_material_override = SubResource("PhysicsMaterial_c6gwx")
+script = ExtResource("1_xhfnw")
+groundedAccel = 10.0
+groundedDeceleration = 10.0
+maxSpeed = 10.0
+camera = NodePath("Camera3D")
+cameraSensitivity = 10.0
+sensitivityDivisor = 100.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1673221575]
+mesh = SubResource("CapsuleMesh_4gn1o")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1141220803]
+shape = SubResource("CapsuleShape3D_p21k6")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=345564869]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.49743003, 0)
+cull_mask = 524287
+environment = SubResource("Environment_2dftf")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Camera3D" unique_id=898288672]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0014519691, -0.021162331, -0.45291784)
+layers = 524288
+mesh = SubResource("BoxMesh_4gn1o")
+surface_material_override/0 = SubResource("StandardMaterial3D_p21k6")
+
+[node name="Interact Raycast" type="RayCast3D" parent="Camera3D" unique_id=429942733]
+transform = Transform3D(0.9999999, 0, 0, 0, 0.9999997, 0, 0, 0, 0.9999998, 0, 0.07799998, 0)
+target_position = Vector3(0, 0, -3)
+collision_mask = 255
+script = ExtResource("2_kpjcp")
+grabPivotScene = ExtResource("3_kne1u")
+grabStrength = 50.0
+grabDampening = 5.0
+grabRotationStrength = 500.0
+fixedJointScene = ExtResource("4_e80uo")
+
+[node name="Grounded Raycast" type="RayCast3D" parent="." unique_id=1300063611]
+transform = Transform3D(0.09999991, 0, 0, 0, 0.09999991, 0, 0, 0, 0.1, 0, -0.96391535, 0)
+target_position = Vector3(0, -0.8, 0)
+debug_shape_custom_color = Color(0.021434637, 0.021434635, 0.021434633, 1)
+debug_shape_thickness = 5
