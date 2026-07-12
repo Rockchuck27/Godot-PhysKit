@@ -5,7 +5,11 @@
 # Planned Features
 - Adjusting the rotation of grabbed objects
 - "E to interact" with objects
+- Outline appears on objects that can be grabbed
 - And any others that come up during development
+
+# To Use
+Simply add Player.tscn to any existing scene, and add the meta tag "grabbable" to any rigidbody you want to be able to pick up.
 
 This toolkit is being developed for my own game, so you can expect updates in the future.
 Please let me know if you encounter any bugs or if there are any features you would like added.
