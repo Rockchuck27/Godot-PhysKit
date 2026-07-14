@@ -29,5 +29,8 @@
 
 
 Since, this toolkit is being developed for my own game, so you can expect continued updates.
-If you find any bugs, or have any suggestions, open an [Issue](https://github.com/Rockchuck27/Godot-PhysKit/issues)
-Any and all support keeps the lights on, gotta pay for college somehow :). [Ko-fi](https://ko-fi.com/rockchuckdev)
+
+If you find any bugs, or have any suggestions, open an [Issue](https://github.com/Rockchuck27/Godot-PhysKit/issues).
+
+Any and all support keeps the lights on, gotta pay for college somehow :). 
+[Ko-fi](https://ko-fi.com/rockchuckdev)
