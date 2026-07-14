@@ -3,7 +3,6 @@
 [ext_resource type="Script" uid="uid://d1udf4t2eh5ob" path="res://PhysKit/PlayerController.cs" id="1_xhfnw"]
 [ext_resource type="Script" uid="uid://d0cr6nkehyxpl" path="res://PhysKit/PlayerInteraction.cs" id="2_kpjcp"]
 [ext_resource type="PackedScene" uid="uid://bsps4p0cvgkyk" path="res://PhysKit/Grab Pivot.tscn" id="3_kne1u"]
-[ext_resource type="PackedScene" uid="uid://bbmai8vp77er" path="res://PhysKit/fixed_joint.tscn" id="4_e80uo"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_c6gwx"]
 friction = 0.0
@@ -64,10 +63,9 @@ target_position = Vector3(0, 0, -3)
 collision_mask = 255
 script = ExtResource("2_kpjcp")
 grabPivotScene = ExtResource("3_kne1u")
-grabStrength = 50.0
-grabDampening = 5.0
+grabStrength = 100.0
+grabDampening = 10.0
 grabRotationStrength = 500.0
-fixedJointScene = ExtResource("4_e80uo")
 
 [node name="Grounded Raycast" type="RayCast3D" parent="." unique_id=1300063611]
 transform = Transform3D(0.09999991, 0, 0, 0, 0.09999991, 0, 0, 0, 0.1, 0, -0.96391535, 0)

@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public partial class PlayerInteraction : RayCast3D
 {
@@ -7,34 +8,46 @@ public partial class PlayerInteraction : RayCast3D
     [Export] public PackedScene grabPivotScene;
     //Called InteractDistance because soon this package will have the ability to interact with other objects, such as talking to an NPC
     [Export] public float maxInteractDistance;
+    [Export] public float dropDistanceBuffer;
     [Export] public float grabStrength;
-    //Prevents jitter, but if turned up to high can make it harder to move objects
+    //Prevents jitter, but if turned up too high can make it harder to move objects
     [Export] public float grabDampening;
     [Export] public float grabRotationStrength;
     [Export] public float grabRotationDampening;
     [Export] public float grabDistanceAdjustmentIncrement;
     [Export] public float grabCenterOffset;
 
-    private Basis rightHandRotationOffset;
-    private Basis leftHandRotationOffset;
-    private RigidBody3D activeRightGrabPivot;
-    private RigidBody3D activeLeftGrabPivot;
-    private Generic6DofJoint3D activeRightHandFixedJoint;
-    private Generic6DofJoint3D activeLeftHandFixedJoint;
-    private RigidBody3D activeRightGrabObject;
-    private RigidBody3D activeLeftGrabObject;
+    private GrabData rightHandGrabData = new GrabData();
+    private GrabData leftHandGrabData = new GrabData();
+    private List<GrabData> activeGrabData = new List<GrabData>();
+
+
+    // Grab Mode Stuff
+    [Export] public bool toggleGrabModeIsOn;
+    [Signal]
+    public delegate void PlayerChangedGrabModeEventHandler(bool isToggleGrabModeOn);
     private float currentGrabDistance;
-    private Vector3 targetRightHandPosition;
-    private Vector3 targetLeftHandPosition;
+
+
+
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
         TargetPosition = new Vector3(0, 0, -maxInteractDistance);
+        EmitSignal(SignalName.PlayerChangedGrabMode, toggleGrabModeIsOn);
+
+        rightHandGrabData.centerOffsetSign = 1;
+        leftHandGrabData.centerOffsetSign = -1;
+
+        activeGrabData.Add(rightHandGrabData);
+        activeGrabData.Add(leftHandGrabData);
+
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(double delta)
     {
+
 
         //GRABBING OBJECT---------------------------
         if (IsColliding())
@@ -42,55 +55,20 @@ public partial class PlayerInteraction : RayCast3D
             Node colliderAsNode = GetCollider() as Node;
             if (colliderAsNode.GetMeta("grabbable", false).AsBool())
             {
-
-                //GRABBING OBJECT WITH RIGHT HAND---------------------------
-                if (Input.IsActionJustPressed("right_grab") && activeRightGrabPivot == null)
+                if (Input.IsActionJustPressed("right_grab") && rightHandGrabData.grabbedObject == null)
                 {
-                    activeRightGrabObject = colliderAsNode as RigidBody3D;
-
-
-                    activeRightGrabPivot = grabPivotScene.Instantiate<RigidBody3D>();
-                    activeRightGrabPivot.Position = GetCollisionPoint();
-                    GetTree().Root.AddChild(activeRightGrabPivot);
-
-
-
-                    //Rotation is applied right to left, so here we undo the rotation of this Node, then apply the rotation of the activeRightGrabPivot, telling us the rotation difference between this Node and the activeRightGrabPivot
-                    rightHandRotationOffset = activeRightGrabPivot.GlobalBasis * GlobalBasis.Inverse();
-
-                    activeRightHandFixedJoint = new Generic6DofJoint3D();
-                    activeRightHandFixedJoint.Position = GetCollisionPoint();
-                    GetTree().Root.AddChild(activeRightHandFixedJoint);
-                    activeRightHandFixedJoint.NodeA = activeRightGrabPivot.GetPath();
-                    activeRightHandFixedJoint.NodeB = activeRightGrabObject.GetPath();
-
-
+                    Grab(ref rightHandGrabData, colliderAsNode as RigidBody3D);
                 }
-                else if (Input.IsActionJustPressed("left_grab") && activeLeftGrabPivot == null)
+                else if (Input.IsActionJustPressed("left_grab") && leftHandGrabData.grabbedObject == null)
                 {
-                    activeLeftGrabObject = colliderAsNode as RigidBody3D;
-
-                    activeLeftGrabPivot = grabPivotScene.Instantiate<RigidBody3D>();
-                    activeLeftGrabPivot.Position = GetCollisionPoint();
-                    GetTree().Root.AddChild(activeLeftGrabPivot);
-
-                    currentGrabDistance = GlobalPosition.DistanceTo(GetCollisionPoint());
-
-                    leftHandRotationOffset = activeLeftGrabPivot.GlobalBasis * GlobalBasis.Inverse();
-
-                    activeLeftHandFixedJoint = new Generic6DofJoint3D();
-                    activeLeftHandFixedJoint.Position = GetCollisionPoint();
-                    GetTree().Root.AddChild(activeLeftHandFixedJoint);
-                    activeLeftHandFixedJoint.NodeA = activeLeftGrabPivot.GetPath();
-                    activeLeftHandFixedJoint.NodeB = activeLeftGrabObject.GetPath();
-
-
+                    Grab(ref leftHandGrabData, colliderAsNode as RigidBody3D);
                 }
             }
-
         }
 
-        if (activeRightGrabPivot != null || activeLeftGrabPivot != null)
+
+
+        if (rightHandGrabData.grabbedObject != null || leftHandGrabData.grabbedObject != null)
         {
             if (Input.IsActionJustPressed("decrease_grab_distance"))
             {
@@ -101,83 +79,143 @@ public partial class PlayerInteraction : RayCast3D
                 currentGrabDistance += grabDistanceAdjustmentIncrement;
             }
             currentGrabDistance = Mathf.Clamp(currentGrabDistance, 0, maxInteractDistance);
+        }
+        HandleDrop(ref rightHandGrabData, "right");
+        HandleDrop(ref leftHandGrabData, "left");
 
-            //DROPPING OBJECT---------------------------
-            if (activeRightGrabPivot != null)
-            {
-
-                //DROPPING OBJECT
-                Vector3 toGrabbedObject = activeRightGrabObject.GlobalPosition - GlobalPosition;
-                //Dot product is some straight up magic, even my calculus teacher doesn't know why it works.
-                // All you need to know, is that if the dot product of two vectors is positive, they are less than 90 degrees apart, and if the product is negative, they are more than 90 degrees apart
-                // What this means for us, is that if the dot product of the direction the player is facing and the direction the object is from this Node is negative, the object is behind the player
-                if (Input.IsActionJustReleased("right_grab") || toGrabbedObject.Dot(-GlobalBasis.Z) < 0)
-                {
-                    DropRight();
-                }
-
-            }
-            if (activeLeftGrabPivot != null)
-            {
-                Vector3 toGrabbedObject = activeLeftGrabObject.GlobalPosition - GlobalPosition;
-                if (Input.IsActionJustReleased("left_grab") || toGrabbedObject.Dot(-GlobalBasis.Z) < 0)
-                {
-                    DropLeft();
-                }
-
-            }
+        if (Input.IsActionJustReleased("toggle_grab_mode"))
+        {
+            toggleGrabModeIsOn = !toggleGrabModeIsOn;
+            EmitSignal(SignalName.PlayerChangedGrabMode, toggleGrabModeIsOn);
         }
 
 
     }
+
+
+
 
 
 
     public override void _PhysicsProcess(double delta)
     {
-        if (activeRightGrabPivot != null)
+        HandlePositionAndRotation(ref rightHandGrabData);
+        HandlePositionAndRotation(ref leftHandGrabData);
+
+    }
+
+    private void HandlePositionAndRotation(ref GrabData grabData)
+    {
+        if (grabData.grabbedObject != null)
         {
             //POSITION OF GRABBED OBJECT
-            targetRightHandPosition = GlobalPosition + GlobalTransform.Basis.X * grabCenterOffset + -GlobalTransform.Basis.Z * currentGrabDistance;
-            Vector3 toTargetPosition = targetRightHandPosition - activeRightGrabPivot.Position;
-            activeRightGrabPivot.ApplyForce(toTargetPosition * grabStrength);
-            activeRightGrabPivot.ApplyForce(-activeRightGrabPivot.LinearVelocity * grabDampening);
+            Vector3 targetPosition = GlobalPosition + (GlobalTransform.Basis.X * grabData.centerOffsetSign * grabCenterOffset) + (-GlobalTransform.Basis.Z * currentGrabDistance);
+            Vector3 toTargetPosition = targetPosition - grabData.grabPivot.GlobalPosition;
+            grabData.grabbedObject.ApplyForce(toTargetPosition * grabStrength);
+            grabData.grabbedObject.ApplyForce(-grabData.grabbedObject.LinearVelocity * grabDampening);
 
             //ROTATION OF GRABBED OBJECT
-            Basis targetBasis = GlobalBasis * rightHandRotationOffset;
-            Quaternion toTargetBasis = (targetBasis * activeRightGrabPivot.GlobalBasis.Inverse()).GetRotationQuaternion();
-            activeRightGrabPivot.ApplyTorque(toTargetBasis.GetAxis() * toTargetBasis.GetAngle() * grabRotationStrength);
-            activeRightGrabPivot.ApplyTorque(-activeRightGrabPivot.AngularVelocity * grabRotationDampening);
-        }
-
-        if (activeLeftGrabPivot != null)
-        {
-            //POSITION OF GRABBED OBJECT
-            targetLeftHandPosition = GlobalPosition - GlobalTransform.Basis.X * grabCenterOffset + -GlobalTransform.Basis.Z * currentGrabDistance;
-            Vector3 toTargetPosition = targetLeftHandPosition - activeLeftGrabPivot.Position;
-            activeLeftGrabPivot.ApplyForce(toTargetPosition * grabStrength);
-            activeLeftGrabPivot.ApplyForce(-activeLeftGrabPivot.LinearVelocity * grabDampening);
-
-            //ROTATION OF GRABBED OBJECT
-            Basis targetBasis = GlobalBasis * leftHandRotationOffset;
-            Quaternion toTargetBasis = (targetBasis * activeLeftGrabPivot.GlobalBasis.Inverse()).GetRotationQuaternion();
-            activeLeftGrabPivot.ApplyTorque(toTargetBasis.GetAxis() * toTargetBasis.GetAngle() * grabRotationStrength);
-            activeLeftGrabPivot.ApplyTorque(-activeLeftGrabPivot.AngularVelocity * grabRotationDampening);
+            Basis targetBasis = GlobalBasis * grabData.rotationOffset;
+            Quaternion toTargetBasis = (targetBasis * grabData.grabbedObject.GlobalBasis.Inverse()).GetRotationQuaternion();
+            grabData.grabbedObject.ApplyTorque(toTargetBasis.GetAxis() * toTargetBasis.GetAngle() * grabData.effectiveRotationStrength);
+            grabData.grabbedObject.ApplyTorque(-grabData.grabbedObject.AngularVelocity * grabData.effectiveRotationDampening);
         }
     }
 
-
-    public void DropRight()
+    public void Grab(ref GrabData grabData, RigidBody3D objectToGrab)
     {
-        activeRightGrabPivot.QueueFree();
-        activeRightHandFixedJoint.QueueFree();
-        activeRightGrabPivot = null;
+        grabData.grabbedObject = objectToGrab;
+
+        grabData.effectiveRotationStrength = grabRotationStrength * grabData.grabbedObject.Scale.X;
+        grabData.effectiveRotationDampening = grabRotationDampening * grabData.grabbedObject.Scale.X;
+
+        Vector3 targetGrabPosition = GetCollisionPoint();
+        if (grabData.grabbedObject.FindChild("Grab Point") != null)
+        {
+            targetGrabPosition = (grabData.grabbedObject.FindChild("Grab Point") as Node3D).GlobalPosition;
+        }
+
+        grabData.grabPivot = grabPivotScene.Instantiate<RigidBody3D>();
+        grabData.grabPivot.Position = targetGrabPosition;
+        GetTree().Root.AddChild(grabData.grabPivot);
+
+        currentGrabDistance = GlobalPosition.DistanceTo(targetGrabPosition);
+
+        if (grabData.grabbedObject.HasMeta("rotation_override"))
+        {
+            Vector3 rotationOverride = grabData.grabbedObject.GetMeta("rotation_override").AsVector3();
+            Vector3 rotationOverrideInRadians = new Vector3(Mathf.DegToRad(rotationOverride.X), Mathf.DegToRad(rotationOverride.Y), Mathf.DegToRad(rotationOverride.Z));
+            grabData.rotationOffset = Basis.FromEuler(rotationOverrideInRadians);
+        }
+        else
+        {
+            grabData.rotationOffset = grabData.grabPivot.GlobalBasis * GlobalBasis.Inverse();
+        }
+
+        grabData.fixedJoint = new Generic6DofJoint3D();
+        grabData.fixedJoint.Position = GetCollisionPoint();
+        GetTree().Root.AddChild(grabData.fixedJoint);
+        grabData.fixedJoint.NodeA = grabData.grabPivot.GetPath();
+        grabData.fixedJoint.NodeB = grabData.grabbedObject.GetPath();
     }
 
-    private void DropLeft()
+    private void HandleDrop(ref GrabData grabData, string handName)
     {
-        activeLeftGrabPivot.QueueFree();
-        activeLeftHandFixedJoint.QueueFree();
-        activeLeftGrabPivot = null;
+        if (grabData.grabbedObject != null)
+        {
+            Vector3 toGrabbedObject = grabData.grabbedObject.GlobalPosition - GlobalPosition;
+            //Dot product is some straight up magic, even my calculus teacher doesn't know why it works.
+            // All you need to know, is that if the dot product of two vectors is positive, they are less than 90 degrees apart, and if the product is negative, they are more than 90 degrees apart
+            // What this means for us, is that if the dot product of the direction the player is facing and the direction the object is from this Node is negative, the object is behind the player
+            if (toGrabbedObject.Dot(-GlobalBasis.Z) < 0)
+            {
+                Drop(ref grabData);
+            }
+            else if (Input.IsActionJustReleased(handName + "_grab"))
+            {
+                if (toggleGrabModeIsOn && !grabData.readyToDrop)
+                {
+                    grabData.readyToDrop = true;
+                }
+                else
+                {
+                    Drop(ref grabData);
+                }
+
+            }
+
+        }
+
+
+
     }
+
+    private void Drop(ref GrabData grabData)
+    {
+        if (grabData.grabbedObject == null)
+        {
+            GD.Print("grabData.grabbedObject is null");
+            return;
+        }
+        grabData.grabPivot.QueueFree();
+        grabData.fixedJoint.QueueFree();
+        grabData.grabPivot = null;
+        grabData.grabbedObject = null;
+        grabData.readyToDrop = false;
+
+    }
+}
+
+
+public class GrabData
+{
+    public RigidBody3D grabPivot;
+    public Generic6DofJoint3D fixedJoint;
+    public RigidBody3D grabbedObject;
+    public Basis rotationOffset;
+    public float effectiveRotationStrength;
+    public float effectiveRotationDampening;
+    public bool readyToDrop;
+    public float centerOffsetSign;
+
 }
