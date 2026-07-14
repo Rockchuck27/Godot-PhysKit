@@ -1,4 +1,3 @@
-Note: This was coded in C#
 # PhysKit v0.1.0-alpha
 - Grabbing and manipulating objects in a physics based way
 - Independently grab objects with your left and right hands
