@@ -53,7 +53,7 @@ public partial class PlayerInteraction : RayCast3D
         if (IsColliding())
         {
             Node colliderAsNode = GetCollider() as Node;
-            if (colliderAsNode.GetMeta("grabbable", false).AsBool())
+            if (colliderAsNode.HasMeta("grabbable"))
             {
                 if (Input.IsActionJustPressed("right_grab") && rightHandGrabData.grabbedObject == null)
                 {
@@ -116,9 +116,9 @@ public partial class PlayerInteraction : RayCast3D
 
             //ROTATION OF GRABBED OBJECT
             Basis targetBasis = GlobalBasis * grabData.rotationOffset;
-            Quaternion toTargetBasis = (targetBasis * grabData.grabbedObject.GlobalBasis.Inverse()).GetRotationQuaternion();
-            grabData.grabbedObject.ApplyTorque(toTargetBasis.GetAxis() * toTargetBasis.GetAngle() * grabData.effectiveRotationStrength);
-            grabData.grabbedObject.ApplyTorque(-grabData.grabbedObject.AngularVelocity * grabData.effectiveRotationDampening);
+            Quaternion toTargetBasis = (targetBasis * grabData.grabPivot.GlobalBasis.Inverse()).GetRotationQuaternion();
+            grabData.grabPivot.ApplyTorque(toTargetBasis.GetAxis() * toTargetBasis.GetAngle() * grabData.effectiveRotationStrength);
+            grabData.grabPivot.ApplyTorque(-grabData.grabPivot.AngularVelocity * grabData.effectiveRotationDampening);
         }
     }
 

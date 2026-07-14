@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://brgrs4j55wuf7"]
 
 [ext_resource type="PackedScene" uid="uid://ufj107qbr1n5" path="res://PhysKit/Player.tscn" id="1_c6gwx"]
-[ext_resource type="PackedScene" uid="uid://dlq3lbnbap4ly" path="res://Guns/Pistol.tscn" id="2_2dftf"]
+[ext_resource type="PackedScene" uid="uid://dlq3lbnbap4ly" path="res://PhysKit/Pistol.tscn" id="2_2dftf"]
 [ext_resource type="Script" uid="uid://damynefi10a6e" path="res://PhysKit/DisplayGrabMode.cs" id="3_e2mk2"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_p21k6"]
@@ -38,9 +38,9 @@ material = SubResource("StandardMaterial3D_bcbcq")
 [sub_resource type="LabelSettings" id="LabelSettings_4gn1o"]
 font_size = 49
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_4gn1o"]
+[sub_resource type="BoxMesh" id="BoxMesh_4gn1o"]
 
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_p21k6"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_kqxok"]
 
 [node name="World" type="Node3D" unique_id=1248491849]
 
@@ -98,6 +98,7 @@ shape = SubResource("BoxShape3D_4gn1o")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.7387543, 2.5476546, -5.6069384)
 collision_layer = 255
 metadata/grabbable = true
+metadata/rotation_override = Vector3(0, 0, 0)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Box" unique_id=110251027]
 mesh = SubResource("BoxMesh_js7pq")
@@ -114,10 +115,6 @@ shape = SubResource("BoxShape3D_p21k6")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D" unique_id=2097689302]
 mesh = SubResource("BoxMesh_kqxok")
 
-[node name="Pistol" parent="." unique_id=728812467 instance=ExtResource("2_2dftf")]
-transform = Transform3D(0.2933029, 0.015995044, -0.060971934, -3.327508e-09, 0.2901811, 0.07612451, 0.063035056, -0.07442513, 0.28370315, -4.303107, 1, 3.3131714)
-metadata/rotation_override = Vector3(0, 90, 20)
-
 [node name="Control" type="Control" parent="." unique_id=1669055129]
 layout_mode = 3
 anchors_preset = 0
@@ -133,20 +130,18 @@ text = "Grab Mode: Toggle"
 label_settings = SubResource("LabelSettings_4gn1o")
 script = ExtResource("3_e2mk2")
 
-[node name="RigidBody3D" type="RigidBody3D" parent="." unique_id=1350294226]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6788713, 1.7123793, 0)
-mass = 0.2
-metadata/grabbable = true
-metadata/override_rotation = Vector3(90, 0, 0)
+[node name="Pistol" parent="." unique_id=728812467 instance=ExtResource("2_2dftf")]
+transform = Transform3D(-1.3113417e-08, 0, 0.3, 0, 0.3, 0, -0.3, 0, -1.3113417e-08, -3.8807187, 0.65, 4.5732994)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D" unique_id=1790150444]
-shape = SubResource("CapsuleShape3D_4gn1o")
+[node name="RigidBody3D" type="RigidBody3D" parent="." unique_id=1942045673]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.81973, 0.23042703)
+metadata/grabbable = false
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D" unique_id=2093083741]
-mesh = SubResource("CapsuleMesh_p21k6")
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D" unique_id=470660944]
+mesh = SubResource("BoxMesh_4gn1o")
 
-[node name="Grab Point" type="Node3D" parent="RigidBody3D" unique_id=1545587893]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0044243336, 0.9797014, 1.1920929e-07)
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D" unique_id=1253989662]
+shape = SubResource("BoxShape3D_kqxok")
 
 [connection signal="PlayerChangedGrabMode" from="Player/Camera3D/Interact Raycast" to="Control/Grab Mode Display" method="OnGrabModeChanged"]
 

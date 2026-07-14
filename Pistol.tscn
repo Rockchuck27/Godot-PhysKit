@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://dlq3lbnbap4ly"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_25n18"]
+size = Vector3(3, 1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_4gn1o"]
+size = Vector3(3, 1, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4gn1o"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_0xgh3"]
+
+[node name="Pistol" type="RigidBody3D" unique_id=728812467]
+transform = Transform3D(-1.3113417e-08, 0, 0.3, 0, 0.3, 0, -0.3, 0, -1.3113417e-08, 0, 0, 0)
+metadata/grabbable = true
+metadata/rotation_override = Vector3(40, 0, 0)
+
+[node name="Barrel" type="CollisionShape3D" parent="." unique_id=514136720]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0)
+shape = SubResource("BoxShape3D_25n18")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="Barrel" unique_id=1509818019]
+mesh = SubResource("BoxMesh_4gn1o")
+
+[node name="Handle" type="CollisionShape3D" parent="." unique_id=897171322]
+shape = SubResource("BoxShape3D_4gn1o")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="Handle" unique_id=1189237834]
+mesh = SubResource("BoxMesh_0xgh3")
+
+[node name="Grab Point" type="Node3D" parent="." unique_id=923376484]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.42161453, 0.18058431, -1.8429356e-08)
