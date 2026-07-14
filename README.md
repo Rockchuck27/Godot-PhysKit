@@ -1,3 +1,4 @@
+![Demo](assets/demo.gif)
 Note: This was coded in C#
 # PhysKit Features
 - Grabbing and manipulating objects in a physics based way
