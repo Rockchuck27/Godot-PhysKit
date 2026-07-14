@@ -1,5 +1,5 @@
 Note: This was coded in C#
-# PhysKit v0.1.0
+# PhysKit v0.1.0-alpha
 - Grabbing and manipulating objects in a physics based way
 - Independently grab objects with your left and right hands
 - A physics based character controller
@@ -14,14 +14,14 @@ Note: This was coded in C#
 - To grab an object with your left hand, press Q. To grab with your right hand, press E.
   - Yes, it makes more sense to use left/right mouse buttons. However, I will soon be adding the ability to "Use" the objects you are holding in each hand (such as firing a weapon). I thought it made more sense for left/right mouse buttons to be used for using objects.
 
-### Grab Point (Node3d)
+## Grab Point (Node3d)
 - If you want the player to grab an object in the same spot every time, add a Node3D with the name "Grab Point", and position it where you want the player to grab the object
 - For example, if your game has a sword, you would want the player to always grab the sword by the handle. So you would add a "Grab Point" child node to the sword and position that "Grab Point" node on the handle of the sword.
 
-### Metadata Properties
-#### Grabbable (boolean)
+## Metadata Properties
+### Grabbable (boolean)
 - Add to any rigidbody you want to pick up. Must be set to true
-#### Rotation Override
+### Rotation Override
 - Add to any grabbable object you want to have a preset rotation relative to the player
 - For example, if the player picked up a sword, you would want the sword to "snap" to the same rotation relative to the camera no matter where the player is facing when they grab it
 

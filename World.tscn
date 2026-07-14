@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://ufj107qbr1n5" path="res://PhysKit/Player.tscn" id="1_c6gwx"]
 [ext_resource type="PackedScene" uid="uid://dlq3lbnbap4ly" path="res://Guns/Pistol.tscn" id="2_2dftf"]
-[ext_resource type="Script" uid="uid://byob73bco3ltd" path="res://DisplayGrabMode.cs" id="3_bcbcq"]
+[ext_resource type="Script" uid="uid://damynefi10a6e" path="res://PhysKit/DisplayGrabMode.cs" id="3_e2mk2"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_p21k6"]
 size = Vector3(24.788147, 1, 22.064514)
@@ -37,6 +37,10 @@ material = SubResource("StandardMaterial3D_bcbcq")
 
 [sub_resource type="LabelSettings" id="LabelSettings_4gn1o"]
 font_size = 49
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_4gn1o"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_p21k6"]
 
 [node name="World" type="Node3D" unique_id=1248491849]
 
@@ -83,7 +87,6 @@ shape = SubResource("BoxShape3D_4gn1o")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.887112, 5.0953093, -1.8886371)
 collision_layer = 255
 metadata/grabbable = true
-metadata/rotation_override = Vector3(0, 90, 0)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Box3" unique_id=563838109]
 mesh = SubResource("BoxMesh_st0g5")
@@ -128,7 +131,22 @@ offset_right = 259.0
 offset_bottom = 1080.0
 text = "Grab Mode: Toggle"
 label_settings = SubResource("LabelSettings_4gn1o")
-script = ExtResource("3_bcbcq")
+script = ExtResource("3_e2mk2")
+
+[node name="RigidBody3D" type="RigidBody3D" parent="." unique_id=1350294226]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6788713, 1.7123793, 0)
+mass = 0.2
+metadata/grabbable = true
+metadata/override_rotation = Vector3(90, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D" unique_id=1790150444]
+shape = SubResource("CapsuleShape3D_4gn1o")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D" unique_id=2093083741]
+mesh = SubResource("CapsuleMesh_p21k6")
+
+[node name="Grab Point" type="Node3D" parent="RigidBody3D" unique_id=1545587893]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0044243336, 0.9797014, 1.1920929e-07)
 
 [connection signal="PlayerChangedGrabMode" from="Player/Camera3D/Interact Raycast" to="Control/Grab Mode Display" method="OnGrabModeChanged"]
 
