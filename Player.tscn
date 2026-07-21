@@ -63,9 +63,14 @@ target_position = Vector3(0, 0, -3)
 collision_mask = 255
 script = ExtResource("2_kpjcp")
 grabPivotScene = ExtResource("3_kne1u")
-grabStrength = 100.0
+maxInteractDistance = 3.0
+dropDistanceBuffer = 1.0
+grabStrength = 50.0
 grabDampening = 10.0
-grabRotationStrength = 500.0
+grabRotationStrength = 50.0
+grabRotationDampening = 10.0
+grabDistanceAdjustmentIncrement = 0.25
+grabCenterOffset = 0.5
 
 [node name="Grounded Raycast" type="RayCast3D" parent="." unique_id=1300063611]
 transform = Transform3D(0.09999991, 0, 0, 0, 0.09999991, 0, 0, 0, 0.1, 0, -0.96391535, 0)

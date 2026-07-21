@@ -4,15 +4,10 @@ using Godot;
 
 public static class Extensions
 {
-    public static Quaternion ToQuaternion(this Vector3 vector3)
+    public static float ToJumpVelocity(this float desiredHeight, float risingGravityMagnitude)
     {
-        Vector3 eulerAnglesInRadians = new Vector3(
-            Mathf.DegToRad(vector3.X),
-            Mathf.DegToRad(vector3.Y),
-            Mathf.DegToRad(vector3.Z)
-        );
+        return Mathf.Sqrt(2 * risingGravityMagnitude * desiredHeight);
 
-        return Quaternion.FromEuler(eulerAnglesInRadians);
     }
 
     public static Vector3 FlattenVector(this Vector3 vector3)

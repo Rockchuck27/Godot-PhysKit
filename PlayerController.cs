@@ -11,7 +11,7 @@ public partial class PlayerController : RigidBody3D
     [Export]
     public float maxSpeed;
     [Export]
-    public float jumpPower;
+    public float jumpHeight;
     [Export]
     public Camera3D camera;
 
@@ -19,6 +19,14 @@ public partial class PlayerController : RigidBody3D
     public float cameraSensitivity;
     [Export]
     public float sensitivityDivisor;
+
+    [Export]
+    public float baseGravityMagnitude = 9.8f;
+    [Export]
+    public float gravityScaleWhenFalling;
+
+    [Export]
+    public float cutFactorWhenJumpReleasedEarly;
 
 
 
@@ -28,6 +36,12 @@ public partial class PlayerController : RigidBody3D
     private RayCast3D _groundedRaycast;
 
     private bool _grounded;
+
+    // INPUT FLAGS
+    //
+
+    private bool _jumpFlag;
+    private bool _cutJumpFlag;
 
 
     // Called when the node enters the scene tree for the first time.
@@ -53,6 +67,33 @@ public partial class PlayerController : RigidBody3D
         {
             _grounded = false;
         }
+
+        if (Input.IsActionJustPressed("uncapture_mouse"))
+        {
+            if (Input.MouseMode == Input.MouseModeEnum.Captured)
+            {
+                Input.MouseMode = Input.MouseModeEnum.Visible;
+            }
+            else
+            {
+                Input.MouseMode = Input.MouseModeEnum.Captured;
+            }
+        }
+
+
+        //JUMPING -------------
+        if (Input.IsActionJustPressed("jump") && _grounded)
+        {
+            _jumpFlag = true;
+        }
+
+        if (Input.IsActionJustReleased("jump") && LinearVelocity.Y > 0)
+        {
+            _cutJumpFlag = true;
+
+        }
+
+
 
 
     }
@@ -101,36 +142,38 @@ public partial class PlayerController : RigidBody3D
         }
 
 
-        //JUMPING -------------
-        if (Input.IsActionJustPressed("jump") && _grounded)
-        {
-            ApplyImpulse(Vector3.Up * jumpPower);
-        }
-
-
-        if (Input.IsActionJustPressed("uncapture_mouse"))
-        {
-            if (Input.MouseMode == Input.MouseModeEnum.Captured)
-            {
-                Input.MouseMode = Input.MouseModeEnum.Visible;
-            }
-            else
-            {
-                Input.MouseMode = Input.MouseModeEnum.Captured;
-            }
-        }
-
-
     }
 
     public override void _IntegrateForces(PhysicsDirectBodyState3D state)
     {
+        Vector3 currentLinearVelocity = state.LinearVelocity;
         Basis = Basis.FromEuler(new Vector3(0, Mathf.DegToRad(_yaw), 0));
 
-        if (LinearVelocity.FlattenVector().Length() > maxSpeed)
+        if (currentLinearVelocity.FlattenVector().Length() > maxSpeed)
         {
-            LinearVelocity = new Vector3(LinearVelocity.Normalized().X * maxSpeed, LinearVelocity.Y, LinearVelocity.Normalized().Z * maxSpeed);
+            LinearVelocity = new Vector3(currentLinearVelocity.Normalized().X * maxSpeed, currentLinearVelocity.Y, currentLinearVelocity.Normalized().Z * maxSpeed);
         }
+
+        if(_jumpFlag){
+            currentLinearVelocity.Y = jumpHeight.ToJumpVelocity(baseGravityMagnitude);
+            _jumpFlag = false;
+        }
+
+        if (_cutJumpFlag)
+        {
+            currentLinearVelocity.Y *= cutFactorWhenJumpReleasedEarly;
+            _cutJumpFlag = false;
+        }
+
+
+
+        //Handling Gravity Manually
+        float appliedGravityMagnitude = currentLinearVelocity.Y < 0 ? baseGravityMagnitude * gravityScaleWhenFalling : baseGravityMagnitude;
+        currentLinearVelocity.Y -= appliedGravityMagnitude * (float)state.Step;
+
+
+        state.LinearVelocity = currentLinearVelocity;
+
     }
 
 }

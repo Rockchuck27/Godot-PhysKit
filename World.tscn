@@ -1,32 +1,33 @@
 [gd_scene format=3 uid="uid://brgrs4j55wuf7"]
 
+[ext_resource type="Material" uid="uid://blyjacuuo55pd" path="res://PhysKit/Materials/White.tres" id="1_6gs8y"]
 [ext_resource type="PackedScene" uid="uid://ufj107qbr1n5" path="res://PhysKit/Player.tscn" id="1_c6gwx"]
 [ext_resource type="PackedScene" uid="uid://dlq3lbnbap4ly" path="res://PhysKit/Pistol.tscn" id="2_2dftf"]
+[ext_resource type="Material" uid="uid://bkso6bolaaka4" path="res://PhysKit/Materials/black.tres" id="3_3h8gp"]
 [ext_resource type="Script" uid="uid://damynefi10a6e" path="res://PhysKit/DisplayGrabMode.cs" id="3_e2mk2"]
+[ext_resource type="Material" uid="uid://r5pdoh8qcrct" path="res://PhysKit/Materials/red.tres" id="6_1t7rw"]
 
-[sub_resource type="BoxMesh" id="BoxMesh_p21k6"]
-size = Vector3(24.788147, 1, 22.064514)
+[sub_resource type="LabelSettings" id="LabelSettings_4gn1o"]
+font_size = 49
+font_color = Color(0.8666667, 0.8666667, 0.8666667, 1)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xhfnw"]
-albedo_color = Color(0.6255971, 0.6255971, 0.6255971, 1)
+[sub_resource type="PlaneMesh" id="PlaneMesh_p21k6"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_st0g5"]
-size = Vector3(25.05577, 1, 22.081543)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sf5y6"]
-albedo_color = Color(0.4382773, 0.4382773, 0.43827745, 1)
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_4gn1o"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_c6gwx"]
-material = SubResource("StandardMaterial3D_sf5y6")
+material = ExtResource("3_3h8gp")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_4gn1o"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2dftf"]
+albedo_color = Color(0.8666667, 0.8666667, 0.8666667, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_st0g5"]
 material = SubResource("StandardMaterial3D_2dftf")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bcbcq"]
+albedo_color = Color(0.8666667, 0.8666667, 0.8666667, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_js7pq"]
 material = SubResource("StandardMaterial3D_bcbcq")
@@ -35,25 +36,43 @@ material = SubResource("StandardMaterial3D_bcbcq")
 
 [sub_resource type="BoxMesh" id="BoxMesh_kqxok"]
 
-[sub_resource type="LabelSettings" id="LabelSettings_4gn1o"]
-font_size = 49
-
 [sub_resource type="BoxMesh" id="BoxMesh_4gn1o"]
+material = ExtResource("6_1t7rw")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_kqxok"]
 
+[sub_resource type="BoxMesh" id="BoxMesh_uo3ap"]
+material = ExtResource("1_6gs8y")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_yv2dd"]
+
 [node name="World" type="Node3D" unique_id=1248491849]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=357712942]
+[node name="Control" type="Control" parent="." unique_id=1669055129]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Grab Mode Display" type="Label" parent="Control" unique_id=435585167]
+layout_mode = 1
+offset_top = 1012.0
+offset_right = 259.0
+offset_bottom = 1080.0
+text = "Grab Mode: Toggle"
+label_settings = SubResource("LabelSettings_4gn1o")
+script = ExtResource("3_e2mk2")
+
+[node name="StaticBody3D5" type="StaticBody3D" parent="." unique_id=233531871]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.60193634, 0, -1.5870056)
-mesh = SubResource("BoxMesh_p21k6")
-surface_material_override/0 = SubResource("StandardMaterial3D_xhfnw")
 
-[node name="StaticBody3D" type="StaticBody3D" parent="MeshInstance3D" unique_id=233531871]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D5" unique_id=799832546]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0)
+material_override = ExtResource("3_3h8gp")
+mesh = SubResource("PlaneMesh_p21k6")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance3D/StaticBody3D" unique_id=51885067]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.23392487, 0, -0.02758789)
-shape = SubResource("BoxShape3D_st0g5")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D5" unique_id=1746593311]
+shape = SubResource("WorldBoundaryShape3D_4gn1o")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1752256361]
 transform = Transform3D(1, 0, 0, 0, 0.79031736, 0.6126977, 0, -0.6126977, 0.79031736, 0, 10.836277, 3.3956814)
@@ -61,15 +80,17 @@ shadow_enabled = true
 
 [node name="Player" parent="." unique_id=138694681 instance=ExtResource("1_c6gwx")]
 transform = Transform3D(0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0, 1, -1.2901249, 3.0062351, -1.100945)
-jumpPower = 5.0
+gravity_scale = 0.0
+groundedDeceleration = 15.0
+jumpHeight = 2.0
+gravityScaleWhenFalling = 1.5
+cutFactorWhenJumpReleasedEarly = 0.5
 
-[node name="Interact Raycast" parent="Player/Camera3D" parent_id_path=PackedInt32Array(138694681, 345564869) index="1" unique_id=429942733]
-maxInteractDistance = 3.0
-grabStrength = 50.0
-grabRotationStrength = 50.0
-grabRotationDampening = 10.0
-grabDistanceAdjustmentIncrement = 0.25
-grabCenterOffset = 0.5
+[node name="MeshInstance3D" parent="Player" index="0" unique_id=1673221575]
+material_override = ExtResource("1_6gs8y")
+
+[node name="MeshInstance3D" parent="Player/Camera3D" parent_id_path=PackedInt32Array(138694681, 345564869) index="0" unique_id=898288672]
+material_override = ExtResource("3_3h8gp")
 
 [node name="Heavy box" type="RigidBody3D" parent="." unique_id=331788972]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.3667927, 2.0782852, -6.1337743)
@@ -89,6 +110,7 @@ collision_layer = 255
 metadata/grabbable = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Box3" unique_id=563838109]
+material_override = ExtResource("1_6gs8y")
 mesh = SubResource("BoxMesh_st0g5")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Box3" unique_id=582111392]
@@ -102,6 +124,7 @@ metadata/rotation_override = Vector3(0, 0, 0)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Box" unique_id=110251027]
 mesh = SubResource("BoxMesh_js7pq")
+surface_material_override/0 = ExtResource("1_6gs8y")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Box" unique_id=487153723]
 shape = SubResource("BoxShape3D_4gn1o")
@@ -113,25 +136,12 @@ transform = Transform3D(0.745, 0, 0, 0, 3.395, 0, 0, 0, 9.795, 8.187567, 2.14546
 shape = SubResource("BoxShape3D_p21k6")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D" unique_id=2097689302]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 0, 0, 0)
+material_override = ExtResource("3_3h8gp")
 mesh = SubResource("BoxMesh_kqxok")
 
-[node name="Control" type="Control" parent="." unique_id=1669055129]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="Grab Mode Display" type="Label" parent="Control" unique_id=435585167]
-layout_mode = 1
-offset_top = 1012.0
-offset_right = 259.0
-offset_bottom = 1080.0
-text = "Grab Mode: Toggle"
-label_settings = SubResource("LabelSettings_4gn1o")
-script = ExtResource("3_e2mk2")
-
 [node name="Pistol" parent="." unique_id=728812467 instance=ExtResource("2_2dftf")]
-transform = Transform3D(-1.3113417e-08, 0, 0.3, 0, 0.3, 0, -0.3, 0, -1.3113417e-08, -3.8807187, 0.65, 4.5732994)
+transform = Transform3D(-1.3113417e-08, 0, 0.3, 0, 0.3, 0, -0.3, 0, -1.3113417e-08, 1.3519197, 0.65, 4.5732994)
 
 [node name="RigidBody3D" type="RigidBody3D" parent="." unique_id=1942045673]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.81973, 0.23042703)
@@ -142,6 +152,35 @@ mesh = SubResource("BoxMesh_4gn1o")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D" unique_id=1253989662]
 shape = SubResource("BoxShape3D_kqxok")
+
+[node name="StaticBody3D4" type="StaticBody3D" parent="." unique_id=1402340485]
+transform = Transform3D(-4.3711385e-08, 0, 2, 0, 1, 0, -0.99999994, 0, -8.742278e-08, -6.5, 3, 5.5)
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="StaticBody3D4" unique_id=322447590]
+mesh = SubResource("BoxMesh_uo3ap")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D4" unique_id=1811672533]
+shape = SubResource("BoxShape3D_yv2dd")
+
+[node name="StaticBody3D3" type="StaticBody3D" parent="." unique_id=503327315]
+transform = Transform3D(-4.3711385e-08, 0, 2, 0, 1, 0, -0.99999994, 0, -8.742278e-08, -6.5, 2, 2.5)
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="StaticBody3D3" unique_id=1974007040]
+material_override = ExtResource("1_6gs8y")
+mesh = SubResource("BoxMesh_uo3ap")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D3" unique_id=1412826495]
+shape = SubResource("BoxShape3D_yv2dd")
+
+[node name="StaticBody3D2" type="StaticBody3D" parent="." unique_id=1309415818]
+transform = Transform3D(-4.3711385e-08, 0, 2, 0, 1, 0, -0.99999994, 0, -8.742278e-08, -6.5, 1, -0.5)
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="StaticBody3D2" unique_id=1635843715]
+material_override = ExtResource("1_6gs8y")
+mesh = SubResource("BoxMesh_uo3ap")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D2" unique_id=706864541]
+shape = SubResource("BoxShape3D_yv2dd")
 
 [connection signal="PlayerChangedGrabMode" from="Player/Camera3D/Interact Raycast" to="Control/Grab Mode Display" method="OnGrabModeChanged"]
 

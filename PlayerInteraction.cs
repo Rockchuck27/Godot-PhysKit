@@ -23,7 +23,7 @@ public partial class PlayerInteraction : RayCast3D
 
 
     // Grab Mode Stuff
-    [Export] public bool toggleGrabModeIsOn;
+    public bool toggleGrabModeIsOn;
     [Signal]
     public delegate void PlayerChangedGrabModeEventHandler(bool isToggleGrabModeOn);
     private float currentGrabDistance;
@@ -167,7 +167,7 @@ public partial class PlayerInteraction : RayCast3D
             //Dot product is some straight up magic, even my calculus teacher doesn't know why it works.
             // All you need to know, is that if the dot product of two vectors is positive, they are less than 90 degrees apart, and if the product is negative, they are more than 90 degrees apart
             // What this means for us, is that if the dot product of the direction the player is facing and the direction the object is from this Node is negative, the object is behind the player
-            if (toGrabbedObject.Dot(-GlobalBasis.Z) < 0)
+            if (toGrabbedObject.Dot(-GlobalBasis.Z) < 0 || toGrabbedObject.Length() > maxInteractDistance + dropDistanceBuffer)
             {
                 Drop(ref grabData);
             }

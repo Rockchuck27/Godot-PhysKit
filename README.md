@@ -1,4 +1,4 @@
-# PhysKit v0.1.1-alpha
+# Physics Arsenal v0.1.2-alpha
 - Grabbing and manipulating objects in a physics based way
 - Independently grab objects with your left and right hands
 - A physics based character controller
