@@ -47,8 +47,6 @@ public partial class PlayerInteraction : RayCast3D
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(double delta)
     {
-
-
         //GRABBING OBJECT---------------------------
         if (IsColliding())
         {
@@ -89,9 +87,7 @@ public partial class PlayerInteraction : RayCast3D
             EmitSignal(SignalName.PlayerChangedGrabMode, toggleGrabModeIsOn);
         }
 
-
     }
-
 
 
 
@@ -101,7 +97,6 @@ public partial class PlayerInteraction : RayCast3D
     {
         HandlePositionAndRotation(ref rightHandGrabData);
         HandlePositionAndRotation(ref leftHandGrabData);
-
     }
 
     private void HandlePositionAndRotation(ref GrabData grabData)
@@ -145,7 +140,7 @@ public partial class PlayerInteraction : RayCast3D
         {
             Vector3 rotationOverride = grabData.grabbedObject.GetMeta("rotation_override").AsVector3();
             Vector3 rotationOverrideInRadians = new Vector3(Mathf.DegToRad(rotationOverride.X), Mathf.DegToRad(rotationOverride.Y), Mathf.DegToRad(rotationOverride.Z));
-            grabData.rotationOffset = Basis.FromEuler(rotationOverrideInRadians);
+            grabData.rotationOffset = Basis.FromEuler(rotationOverrideInRadians) * grabData.grabbedObject.GlobalBasis.Inverse();
         }
         else
         {

@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://brgrs4j55wuf7"]
 
-[ext_resource type="Material" uid="uid://blyjacuuo55pd" path="res://PhysKit/Materials/White.tres" id="1_6gs8y"]
-[ext_resource type="PackedScene" uid="uid://ufj107qbr1n5" path="res://PhysKit/Player.tscn" id="1_c6gwx"]
-[ext_resource type="PackedScene" uid="uid://dlq3lbnbap4ly" path="res://PhysKit/Pistol.tscn" id="2_2dftf"]
-[ext_resource type="Material" uid="uid://bkso6bolaaka4" path="res://PhysKit/Materials/black.tres" id="3_3h8gp"]
-[ext_resource type="Script" uid="uid://damynefi10a6e" path="res://PhysKit/DisplayGrabMode.cs" id="3_e2mk2"]
-[ext_resource type="Material" uid="uid://r5pdoh8qcrct" path="res://PhysKit/Materials/red.tres" id="6_1t7rw"]
+[ext_resource type="Material" uid="uid://blyjacuuo55pd" path="res://Physics Arsenal/Materials/White.tres" id="1_6gs8y"]
+[ext_resource type="PackedScene" uid="uid://ufj107qbr1n5" path="res://Physics Arsenal/Player.tscn" id="1_c6gwx"]
+[ext_resource type="PackedScene" uid="uid://dlq3lbnbap4ly" path="res://Physics Arsenal/Pistol.tscn" id="2_2dftf"]
+[ext_resource type="Material" uid="uid://bkso6bolaaka4" path="res://Physics Arsenal/Materials/black.tres" id="3_3h8gp"]
+[ext_resource type="Script" uid="uid://damynefi10a6e" path="res://Physics Arsenal/DisplayGrabMode.cs" id="3_e2mk2"]
+[ext_resource type="Material" uid="uid://r5pdoh8qcrct" path="res://Physics Arsenal/Materials/red.tres" id="6_1t7rw"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_4gn1o"]
 font_size = 49
@@ -64,7 +64,7 @@ label_settings = SubResource("LabelSettings_4gn1o")
 script = ExtResource("3_e2mk2")
 
 [node name="StaticBody3D5" type="StaticBody3D" parent="." unique_id=233531871]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.60193634, 0, -1.5870056)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.60193634, 0.47896385, -1.5870056)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D5" unique_id=799832546]
 transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0)
@@ -141,7 +141,8 @@ material_override = ExtResource("3_3h8gp")
 mesh = SubResource("BoxMesh_kqxok")
 
 [node name="Pistol" parent="." unique_id=728812467 instance=ExtResource("2_2dftf")]
-transform = Transform3D(-1.3113417e-08, 0, 0.3, 0, 0.3, 0, -0.3, 0, -1.3113417e-08, 1.3519197, 0.65, 4.5732994)
+transform = Transform3D(3.109905e-09, 0.29144156, -0.07114635, 1.27393145e-08, -0.07114635, -0.29144156, -0.29999998, 1.6652148e-17, -1.3113415e-08, 1.3519197, 2.0276728, 4.5732994)
+metadata/rotation_override = Vector3(0, 90, 0)
 
 [node name="RigidBody3D" type="RigidBody3D" parent="." unique_id=1942045673]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.81973, 0.23042703)
